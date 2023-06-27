@@ -9,7 +9,7 @@ This is the code to perform the generation phase analysis for simulating the hig
 The global mesh is generated based on the geometry of the plate specimens and will not change with crack propagation. The local mesh is generated based on	 the shape of crack front, and update with the crack propagation. The history of crack velocity and crack shape is captured by the high-speed camera during the experiment. The experimental data is stored in “Arrest_Generation/ generation/ experiments_data”. The input files like meshes and boundary conditions are generated using the Python and the all the input files will be moved to the SFEM solver which is developed based on Fortran to perform the analysis. The code to perform the postprocess is also developed based on Python and using the output files from the SFEM solver, the postprocess code can calculate the J-integral and stress intensity factor.
 
 ## Install
-sfem_linear配下にarrestディレクトリを作成する。
+Create an arrest directory under sfem_linear.
 ```
 git clone git@gitlab.com:morita/sfem_linear.git
 git clone git@github.com:FuruhashiFumihito/arrest.git
@@ -18,11 +18,11 @@ pip install -r requirements.txt
 ```
 
 ## Usage
-arrestディレクトリからsrc/main.pyを実行する。
+Run src/main.py from the arrest directory.
 ```
 python3 src/main.py
 ```
-コマンドは以下。
+The command is below.
 ```
 --h, --help  Show help message and text.
 --test_start  Specify first test number. (default: 1)
