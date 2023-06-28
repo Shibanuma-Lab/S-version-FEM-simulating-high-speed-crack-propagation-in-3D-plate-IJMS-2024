@@ -1,7 +1,3 @@
-# Gneration phase analysis
-
-====
-
 # Overview
 This is the code to perform the generation phase analysis for simulating the high-speed crack propagation in a 3D plate made by polymethyl methacrylate. 
 
