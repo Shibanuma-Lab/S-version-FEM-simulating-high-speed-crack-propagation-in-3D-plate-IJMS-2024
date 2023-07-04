@@ -14,9 +14,9 @@ pip install -r requirements.txt
 ```
 
 ## Usage
-Run src/main.py from the arrest directory.
+Run main.py from the generation directory.
 ```
-python3 src/main.py
+python3 main.py
 ```
 The command is below.
 ```
