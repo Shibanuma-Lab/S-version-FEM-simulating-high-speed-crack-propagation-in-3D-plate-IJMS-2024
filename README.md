@@ -8,7 +8,7 @@ The global mesh is generated based on the geometry of the plate specimens and wi
 Create an arrest directory under sfem_linear.
 ```
 git clone git@gitlab.com:morita/sfem_linear.git
-git clone git@github.com:Shibanuma-Lab/S-method-dynamic-crack-propgation-3D-plate.git
+git clone https://github.com/Shibanuma-Lab/S-method-dynamic-crack-propgation-3D-plate
 cd arrest
 pip install -r requirements.txt
 ```
