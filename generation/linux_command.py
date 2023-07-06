@@ -15,23 +15,23 @@ def run(step):
     str_step = step2str(step)
 
     try:
-        os.mkdir(f"/home/{username}/{reponame}/arrest/generation/Newton/{dirnametest}")
-        os.mkdir(f"/home/{username}/{reponame}/arrest/generation/Newton/{dirnametest}/{day}")
-        os.mkdir(f"/home/{username}/{reponame}/arrest/generation/Newton/{dirnametest}/{day}/step{str_step}")
+        os.mkdir(f"/home/{username}/arrest/{reponame}/arrest/generation/Newton/{dirnametest}")
+        os.mkdir(f"/home/{username}/arrest/{reponame}/arrest/generation/Newton/{dirnametest}/{day}")
+        os.mkdir(f"/home/{username}/arrest/{reponame}/arrest/generation/Newton/{dirnametest}/{day}/step{str_step}")
     except:
         pass
 
     com_list = [
-        f"cp -r {os.getcwd()} /home/{username}/{reponame}/example", # /home/{username}/sfem/example
-        f"cd /home/{username}/{reponame}/example/step{str_step}",
+        f"cp -r {os.getcwd()} /home/{username}/arrest/{reponame}/example", # /home/{username}/sfem/example
+        f"cd /home/{username}/arrest/{reponame}/example/step{str_step}",
         f"export OPM_NUM_THREADS={sim_params.OPENMP}",
-        f"cd /home/{username}/{reponame}/example",
-        f"chmod +x /home/{username}/{reponame}/bin/sfem_linear",
-        f"/home/{username}/{reponame}/bin/sfem_linear",
-        f"cp /home/{username}/{reponame}/example/step{str_step}/ /home/{username}/{reponame}/example/{dirname}/ -r",
-        f"cp /home/{username}/{reponame}/example/step{str_step}/ /home/{username}/{reponame}/arrest/generation/Newton/{dirnametest}/{day} -r",
-        f"rm /home/{username}/{reponame}/example/step{str_step} -r",
-        f"cp /home/{username}/{reponame}/arrest/generation/inputfiles/step{str_step}/ /home/{username}/{reponame}/arrest/generation/Newton/{dirnametest}/{day} -r",
+        f"cd /home/{username}/arrest/{reponame}/example",
+        f"chmod +x /home/{username}/arrest/{reponame}/bin/sfem_linear",
+        f"/home/{username}/arrest/{reponame}/bin/sfem_linear",
+        f"cp /home/{username}/arrest/{reponame}/example/step{str_step}/ /home/{username}/arrest/{reponame}/example/{dirname}/ -r",
+        f"cp /home/{username}/arrest/{reponame}/example/step{str_step}/ /home/{username}/arrest/generation/Newton/{dirnametest}/{day} -r",
+        f"rm /home/{username}/arrest/{reponame}/example/step{str_step} -r",
+        f"cp /home/{username}/arrest/generation/inputfiles/step{str_step}/ /home/{username}/arrest/generation/Newton/{dirnametest}/{day} -r",
 
     ]
 

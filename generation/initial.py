@@ -1,6 +1,7 @@
 import math
 from scipy import optimize
 import sys
+import pickle
 from const import simulation_params as sim_params
 from const import const_local_mesh
 import local_mesh
@@ -88,21 +89,23 @@ def initial(step: int, l, g) -> None:
     ndoflistnowL = [3] * nnpL
     for i in range(orangeDIM):
         ndoflistnowL[orange[i]] = 6
-    
-    interm = sim_params.INTERM
-    l_bf = local_mesh.LocalMesh(step-interm-1)
-    l_bf.make_local_mesh()
-    posLzxps = l_bf.node_zx
-    enLzxps = l_bf.enLzx
-    nnpLzxps = len(posLzxps)
-    nelLzxps = len(enLzxps)
 
     user_name = sim_params.USER_NAME
     repo_name = sim_params.REPO_NAME
     dirnametest = sim_params.DIR_NAME_TEST
+    interm = sim_params.INTERM
+    str_step_pre = step2str(step-interm-1)
+    path = f"/home/{user_name}/arrest/generation/inputfiles/step{str_step_pre}/"
+    with open(path+"local_mesh.pickel", "rb") as f:
+        l_bf = pickle.load(f)
+    posLzxps = l_bf.node_zx
+    nnpLzxps = len(posLzxps)
+    enLzxps = l_bf.enLzx
+    nelLzxps = len(enLzxps)
+
     day = sim_params.DAY
     str_step = step2str(step-1)
-    path = f"/home/{user_name}/{repo_name}/arrest/generation/Newton/{dirnametest}/{day}/step{str_step}/"
+    path = f"/home/{user_name}/arrest/generation/Newton/{dirnametest}/{day}/step{str_step}/"
     ndoflistpsL = []
     with open(path+"ndof_list.txt", "r") as f:
         lines = f.readlines()
@@ -123,7 +126,7 @@ def initial(step: int, l, g) -> None:
 
     def load(filename):
         ans = []
-        path = f"/home/{user_name}/{repo_name}/arrest/generation/Newton/{dirnametest}/{day}/step{str_step}/"
+        path = f"/home/{user_name}/arrest/generation/Newton/{dirnametest}/{day}/step{str_step}/"
         with open(path+filename, "r") as f:
             lines = f.readlines()
             for line in lines[1:]:
@@ -298,7 +301,7 @@ def initial(step: int, l, g) -> None:
     
     
     str_step = step2str(step)
-    path = f"/home/{user_name}/{repo_name}/arrest/generation/inputfiles/step{str_step}/"
+    path = f"/home/{user_name}/arrest/generation/inputfiles/step{str_step}/"
     def write(filename, array):
         with open(path+filename, "w") as f:
             f.write(f"{len(array)}\n")

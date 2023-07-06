@@ -3,11 +3,12 @@ import math
 from scipy import interpolate
 from scipy.optimize import fsolve, root_scalar
 from typing import List
+import pickle
 import experiments_data
 from const import simulation_params as sim_params
 from const import const_local_mesh
 from const import const_jintegral as j
-import utils.logger as logger
+from utils.logger import logger
 
 nterm = experiments_data.nterm
 
@@ -175,18 +176,18 @@ class LocalMesh:
             if self.tip_x <= coefhis[-1][self.nterm-1]:
                 self.cotip = coeff(self.tip_x)
             else:
-                self.cotip = coefhis[-1][:self.nterm-1] + [self.tip_x]
+                self.cotip = np.concatenate((coefhis[-1][:self.nterm-1], [self.tip_x]))
         else:
-            self.cotip = coefhis[nfcoef-1][:self.nterm-1] + [self.tip_x]
+            self.cotip = np.concatenate((coefhis[nfcoef-1][:self.nterm-1], [self.tip_x]))
 
         self.postip1x = const_local_mesh.elesizeL * (self.step + 1) - 35.
         if coefhis[nfcoef-1][self.nterm-1] <= self.postip1x:
             if self.postip1x <= coefhis[-1][self.nterm-1]:
                 self.cotip1 = coeff(self.postip1x)
             else:
-                self.cotip1 = coefhis[-1][:self.nterm-1] + [self.postip1x]
+                self.cotip1 = np.concatenate((coefhis[-1][:self.nterm-1], [self.postip1x]))
         else:
-            self.cotip1 = coefhis[nfcoef-1][:self.nterm-1] + [self.postip1x]
+            self.cotip1 = np.concatenate((coefhis[nfcoef-1][:self.nterm-1], [self.postip1x]))
 
     def _calc_crack_front_1_node(self):
         z = 0.0
@@ -341,6 +342,8 @@ class LocalMesh:
 
         self.node_by_line = node_by_line # posLzx0
         self.num_node_by_line = num_node_by_line # nposLzx0
+
+        logger.info(f"self.cotip: {self.cotip}, self.cotip1: {self.cotip1}")
         
         self.node_zx = np.array([node for nodes in node_by_line for node in nodes])
         self.num_node_zx = len(self.node_zx)
@@ -404,3 +407,6 @@ class LocalMesh:
             behinddat = [len([j for i in node_by_line[:lL-1] for j in i])]
             np.savetxt("qcalculation.dat", qcal, fmt="%s")
             np.savetxt("behind.dat", behinddat, fmt="%s")
+
+        with open("local_mesh.pickel", mode="wb") as f:
+            pickle.dump(self, f)

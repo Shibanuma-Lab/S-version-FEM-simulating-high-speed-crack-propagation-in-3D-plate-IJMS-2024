@@ -7,7 +7,8 @@ DIR_NAME_ADD_LIST = ["R0.8_No.1", "R0.8_No.2", "R1.0_No.1", "R1.0_No.2", "R1.2_N
 DIR_NAME_ADD = DIR_NAME_ADD_LIST[TEST_NUMBER-1]
 DIR_NAME_TEST_LIST = ["R0_8__NO1", "R0_8__NO2", "R1_0__NO1", "R1_0__NO2", "R1_2__NO1", "R1_2__NO2"]
 DIR_NAME_TEST = DIR_NAME_TEST_LIST[TEST_NUMBER-1]
-DAY = datetime.datetime.now().strftime("%Y%m%d")
+# DAY = datetime.datetime.now().strftime("%Y-%m-%d")
+DAY = "test"
 
 LOCAL_01_LIST = [1]
 DYNAMIC_01_LIST = [1]
