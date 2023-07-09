@@ -253,7 +253,7 @@ def jintegral(step, l):
     dirname = sim_params.UBUNTU_DIR
     dirnametest = sim_params.DIR_NAME_TEST
     day = sim_params.DAY
-    path = f"/home/{username}/arrest/generation/Newton/{dirnametest}/{day}/step{str_step}"
+    path = f"Newton/{dirnametest}/{day}/step{str_step}"
     # indexを削除する
     disLG = np.delete(np.loadtxt(fname=path+"/log/u_gl.l.dat", skiprows=1), obj=0, axis=1)
     acceLG = np.delete(np.loadtxt(fname=path+"/log/a.l.dat", skiprows=1), obj=0, axis=1)
@@ -524,13 +524,13 @@ def jintegral(step, l):
     
     dirnametest = sim_params.DIR_NAME_TEST
     day = sim_params.DAY
-    path = f"/home/{username}/arrest/generation/Newton/{dirnametest}/{day}/step{str_step}/Jlist.dat"
+    path = f"Newton/{dirnametest}/{day}/step{str_step}/Jlist.dat"
     with open (path, mode="w+") as f:
         for line in Jlist:
             f.write(str(line)+"\n")
     f.close()
 
-    path = f"/home/{username}/arrest/generation/Newton/{dirnametest}/{day}/Jlistall.dat"
+    path = f"Newton/{dirnametest}/{day}/Jlistall.dat"
     with open (path, mode="a") as f:
         for line in Jlist:
             if line is None:

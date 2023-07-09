@@ -19,9 +19,8 @@ from utils.logger import logger
 from utils.step2str import step2str
 
 def makemeshs(step):
+    logger.info(os.getcwd())
     str_step = step2str(step)
-    user_name = sim_params.USER_NAME
-    os.chdir(f"/home/{user_name}/arrest/generation")
     try:
         os.mkdir(f"inputfiles/step{str_step}")
     except:
@@ -46,6 +45,7 @@ def makemeshs(step):
     load_generator.generate()
     if step >= 1 + sim_params.INTERM or sim_params.REstart == 1:
         init = initial(step, l, g)
+    os.chdir("../../")
     return l, g
 
 def jint(step, l):
@@ -78,20 +78,6 @@ def main():
     test_start = args.test_start
     test_end = args.test_end
     user_name = sim_params.USER_NAME
-    repo_name = sim_params.REPO_NAME
-    dirnametest = sim_params.DIR_NAME_TEST
-    day = sim_params.DAY
-
-    if args.delete:
-        try:
-            shutil.rmtree(f"/home/{user_name}/arrest/generation/inputfiles/")
-            shutil.rmtree(f"/home/{user_name}/arrest/generation/Newton/{dirnametest}/{day}")
-            os.mkdir(f"/home/{user_name}/arrest/generation/inputfiles/")
-            os.mkdir(f"/home/{user_name}/arrest/generation/Newton/{dirnametest}/{day}")
-        except:
-            pass
-    else:
-        pass
 
     for test in range(test_start, test_end + 1):
         if args.debugmode:
@@ -108,7 +94,6 @@ def main():
                     if args.is_meshonly:
                         break
                     linux_command.run(step)
-                    os.chdir(f"/home/{user_name}/arrest/generation")
                     if step >= 3:
                         Jlist = jintegral(step, l)
                         logger.info(f"Jlist: {Jlist}")
@@ -128,7 +113,6 @@ def main():
                     if args.is_meshonly:
                         continue
                     linux_command.run(step)
-                    os.chdir(f"/home/{user_name}/arrest/generation")
                     if step >= 3:
                         Jlist = jintegral(step, l)
                         logger.info(f"Jlist: {Jlist}")
@@ -139,7 +123,6 @@ def main():
             for step in step_list:
                 l, g = makemeshs(step)
                 linux_command.run(step)
-                os.chdir(f"/home/{user_name}/arrest/generation")
                 Jlist = jintegral(step, l)
                 logger.info(f"Jlist: {Jlist}")
 

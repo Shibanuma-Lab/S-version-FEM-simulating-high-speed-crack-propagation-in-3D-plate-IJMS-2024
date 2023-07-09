@@ -95,7 +95,8 @@ def initial(step: int, l, g) -> None:
     dirnametest = sim_params.DIR_NAME_TEST
     interm = sim_params.INTERM
     str_step_pre = step2str(step-interm-1)
-    path = f"/home/{user_name}/arrest/generation/inputfiles/step{str_step_pre}/"
+    import os
+    path = f"../step{str_step_pre}/"
     with open(path+"local_mesh.pickel", "rb") as f:
         l_bf = pickle.load(f)
     posLzxps = l_bf.node_zx
@@ -105,7 +106,7 @@ def initial(step: int, l, g) -> None:
 
     day = sim_params.DAY
     str_step = step2str(step-1)
-    path = f"/home/{user_name}/arrest/generation/Newton/{dirnametest}/{day}/step{str_step}/"
+    path = f"../../Newton/{dirnametest}/{day}/step{str_step}/"
     ndoflistpsL = []
     with open(path+"ndof_list.txt", "r") as f:
         lines = f.readlines()
@@ -126,7 +127,7 @@ def initial(step: int, l, g) -> None:
 
     def load(filename):
         ans = []
-        path = f"/home/{user_name}/arrest/generation/Newton/{dirnametest}/{day}/step{str_step}/"
+        path = f"../../Newton/{dirnametest}/{day}/step{str_step}/"
         with open(path+filename, "r") as f:
             lines = f.readlines()
             for line in lines[1:]:
@@ -301,7 +302,7 @@ def initial(step: int, l, g) -> None:
     
     
     str_step = step2str(step)
-    path = f"/home/{user_name}/arrest/generation/inputfiles/step{str_step}/"
+    path = f""
     def write(filename, array):
         with open(path+filename, "w") as f:
             f.write(f"{len(array)}\n")

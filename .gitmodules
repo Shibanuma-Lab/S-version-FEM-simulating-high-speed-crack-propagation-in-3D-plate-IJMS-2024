@@ -1,0 +1,9 @@
+[submodule "sfem_linear/submodule/monolis"]
+	path = submodule/monolis
+	url = git@gitlab.com:morita/monolis.git
+	ignore = dirty
+
+[submodule "sfem_linear/monolis"]
+	path = sfem_linear
+	url = git@gitlab.com:morita/sfem_linear.git
+	ignore = dirty

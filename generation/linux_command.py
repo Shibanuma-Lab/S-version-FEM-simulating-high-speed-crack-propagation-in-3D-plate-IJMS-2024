@@ -13,28 +13,21 @@ def run(step):
     day = sim_params.DAY
 
     str_step = step2str(step)
-
+    logger.info(f"run: now {os.getcwd()}")
     try:
-        os.mkdir(f"/home/{username}/arrest/{reponame}/arrest/generation/Newton/{dirnametest}")
-        os.mkdir(f"/home/{username}/arrest/{reponame}/arrest/generation/Newton/{dirnametest}/{day}")
-        os.mkdir(f"/home/{username}/arrest/{reponame}/arrest/generation/Newton/{dirnametest}/{day}/step{str_step}")
+        os.mkdir(f"/Newton/{dirnametest}")
+        os.mkdir(f"/Newton/{dirnametest}/{day}")
+        os.mkdir(f"/Newton/{dirnametest}/{day}/step{str_step}")
     except:
         pass
-
-    com_list = [
-        f"cp -r {os.getcwd()} /home/{username}/arrest/{reponame}/example", # /home/{username}/sfem/example
-        f"cd /home/{username}/arrest/{reponame}/example/step{str_step}",
-        f"export OPM_NUM_THREADS={sim_params.OPENMP}",
-        f"cd /home/{username}/arrest/{reponame}/example",
-        f"chmod +x /home/{username}/arrest/{reponame}/bin/sfem_linear",
-        f"/home/{username}/arrest/{reponame}/bin/sfem_linear",
-        f"cp /home/{username}/arrest/{reponame}/example/step{str_step}/ /home/{username}/arrest/{reponame}/example/{dirname}/ -r",
-        f"cp /home/{username}/arrest/{reponame}/example/step{str_step}/ /home/{username}/arrest/generation/Newton/{dirnametest}/{day} -r",
-        f"rm /home/{username}/arrest/{reponame}/example/step{str_step} -r",
-        f"cp /home/{username}/arrest/generation/inputfiles/step{str_step}/ /home/{username}/arrest/generation/Newton/{dirnametest}/{day} -r",
-
-    ]
-
-    for com in com_list:
-        subprocess.run(com, shell=True)
-        
+    
+    subprocess.run([f"cp", "-r", f"inputfiles/step{str_step}",  f"../{reponame}/example"])
+    subprocess.run([f"chmod", "+x", f"../{reponame}/bin/sfem_linear"])
+    subprocess.run([f"chmod", "+r", f"../{reponame}/bin/sfem_linear"])
+    os.chdir(f"../{reponame}/example/step{str_step}")
+    subprocess.run([f"../../bin/sfem_linear"])
+    os.chdir(f"../") # /example
+    subprocess.run([f"cp", f"step{str_step}", f"../../generation/Newton/{dirnametest}/{day}", "-r"])
+    subprocess.run([f"rm", f"step{str_step}", "-r"])
+    os.chdir(f"../../generation")
+    logger.info(f"run: end {os.getcwd()}")
