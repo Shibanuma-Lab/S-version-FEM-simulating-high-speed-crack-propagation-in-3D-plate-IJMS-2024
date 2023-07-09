@@ -15,11 +15,17 @@ def run(step):
     str_step = step2str(step)
     logger.info(f"run: now {os.getcwd()}")
     try:
-        os.mkdir(f"/Newton/{dirnametest}")
-        os.mkdir(f"/Newton/{dirnametest}/{day}")
-        os.mkdir(f"/Newton/{dirnametest}/{day}/step{str_step}")
+        os.mkdir(f"Newton/{dirnametest}")
     except:
-        pass
+        logger.error("Did NOT make directory")
+    try:
+        os.mkdir(f"Newton/{dirnametest}/{day}")
+    except:
+        logger.error("Did NOT make directory")
+    try:
+        os.mkdir(f"Newton/{dirnametest}/{day}/step{str_step}")
+    except:
+        logger.error("Did NOT make directory")
     
     subprocess.run([f"cp", "-r", f"inputfiles/step{str_step}",  f"../{reponame}/example"])
     subprocess.run([f"chmod", "+x", f"../{reponame}/bin/sfem_linear"])
