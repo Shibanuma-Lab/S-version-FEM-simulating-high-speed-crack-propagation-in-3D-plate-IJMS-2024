@@ -57,9 +57,6 @@ def jint(step, l):
 def main():
     logger.info("SIMULATION START")
 
-    os.chdir(os.getcwd())
-    os.chdir(os.path.dirname(os.getcwd()))
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
     logger.info(os.getcwd())
 
     argparser = argparse.ArgumentParser()
