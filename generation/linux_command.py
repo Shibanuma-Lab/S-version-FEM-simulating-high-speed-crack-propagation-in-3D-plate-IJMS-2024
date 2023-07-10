@@ -28,8 +28,7 @@ def run(step):
         logger.error("Did NOT make directory")
     
     subprocess.run([f"cp", "-r", f"inputfiles/step{str_step}",  f"../{reponame}/example"])
-    subprocess.run([f"chmod", "+x", f"../{reponame}/bin/sfem_linear"])
-    subprocess.run([f"chmod", "+r", f"../{reponame}/bin/sfem_linear"])
+    subprocess.run([f"chmod", "+xr", f"../{reponame}/bin/sfem_linear"])
     os.chdir(f"../{reponame}/example/step{str_step}")
     subprocess.run([f"../../bin/sfem_linear"])
     os.chdir(f"../") # /example
