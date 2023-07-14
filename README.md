@@ -1,7 +1,7 @@
-# 概况
+# Overview 概要 
 This is the code to perform the generation phase analysis for simulating the high-speed crack propagation in a 3D plate made by polymethyl methacrylate. 
 
-## 描述
+# Description 説明 
 The global mesh is generated based on the geometry of the plate specimens and will not change with crack propagation. The local mesh is generated based on	 the shape of crack front, and update with the crack propagation. The history of crack velocity and crack shape is captured by the high-speed camera during the experiment. The experimental data is stored in “Arrest_Generation/ generation/ experiments_data”. The input files like meshes and boundary conditions are generated using the Python and the all the input files will be moved to the SFEM solver which is developed based on Fortran to perform the analysis. The code to perform the postprocess is also developed based on Python and using the output files from the SFEM solver, the postprocess code can calculate the J-integral and stress intensity factor.
 
 ## Install
