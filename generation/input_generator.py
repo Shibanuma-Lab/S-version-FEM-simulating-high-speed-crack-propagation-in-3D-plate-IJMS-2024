@@ -24,7 +24,7 @@ def generate(step) -> None:
             [j.Alpha_l, "\t!> Rm for Rayleigh damping for mass"],
             [j.Beta_l, "\t!> Rk for Rayleigh damping for mass"],
             [2, "\t!> local mesh integral point (not used)"],
-            [const_local_mesh.href, "\t!> local mesh h-refine"],
+            [sim_params.HREF, "\t!> local mesh h-refine"],
             [REstart, "\t!> is_Restart (0:off, 1:on)"],
             [2, "\t!> XFEM(1:global, 2:local)"],
             [0.015, "\t!> thickness"],
