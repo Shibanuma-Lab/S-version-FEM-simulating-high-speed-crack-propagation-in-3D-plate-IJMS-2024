@@ -1,11 +1,11 @@
 import math
 from const import const_global_mesh
 
-hL = 0.29       # loal mesh size in the x direction[mm]
+hL = 0.3      # loal mesh size in the x direction[mm]
 elesizeL = hL
-rxzL = 0.5      # ratio of x - z
+rxzL = 2      # ratio of x - z
 rxyL = 1        # ratio of x - y
-hLz = 15 / 20   # local mesh size in the z direction[mm]
+hLz = rxzL * hL  # local mesh size in the z direction[mm]
 hLy = rxyL * hL # local mesh size in the y direction[mm]
 
 Localmag = 1

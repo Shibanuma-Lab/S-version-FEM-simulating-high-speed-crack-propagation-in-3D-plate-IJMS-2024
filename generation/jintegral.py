@@ -1,7 +1,6 @@
 import numpy as np
 import math
 from typing import List
-
 from const import const_local_mesh
 from const import const_jintegral as jint
 from const import simulation_params as sim_params
@@ -22,11 +21,11 @@ def q0(i: List[float]) -> float:
         qR = 0
     
     qW = 0
-    if i[1] < jint.Wj0:
+    if i[1] < jint.Rj0:
         qW = 1
-    elif jint.Wj0 <= i[1] < jint.Wj1:
-        qW = (jint.Wj0 - i[1])/(jint.Wj1-jint.Wj0)
-    elif jint.Wj1 <= i[1]:
+    elif jint.Rj0 <= i[1] < jint.Rj1:
+        qW = (jint.Rj0 - i[1])/(jint.Rj1-jint.Rj0)
+    elif jint.Rj1 <= i[1]:
         qW = 0
     
     return qR * qW
@@ -173,7 +172,7 @@ def jintegral(step, l):
     for i in range(len(posLzx0)):
         revd_posLzx0 = posLzx0[i][1:][::-1]
         sym_posLzx0 = np.concatenate([revd_posLzx0, posLzx0[i]])
-        _ = [0] * len(sym_posLzx0)
+        _ = [0 for i in range(len(sym_posLzx0))]
         for j in range(len(sym_posLzx0)):
             if j < (len(sym_posLzx0) + 1) / 2:
                 _[j] = [-sym_posLzx0[j][0], sym_posLzx0[j][1]]
@@ -182,6 +181,7 @@ def jintegral(step, l):
         posLzx0X[i] = _
     
     nposLzxX = [len(posLzx0X[i]) for i in range(len(posLzx0X))] # number of nodes of crack line
+    # logger.info(f"step: {step} :: nposLzxX: {nposLzxX}")
     posLzxX = flatten(posLzx0X) # all nodes
     nnpLzxX = len(posLzxX) # number of all nodes
     
@@ -212,6 +212,7 @@ def jintegral(step, l):
     enLX = [
         [enLzxX[i][k]+nnpLzxX*(j-1) for k in range(4)]+[enLzxX[i][k]+nnpLzxX*j for k in range(4)] for j in range(1, ndyL+1) for i in range(nelLzxX)
         ] # all elements
+    # logger.info(f"step: {step} :: enLX: {enLX}")
 
     elesizeyL = const_local_mesh.elesizeyL
     newposLX = [[posLzxX[i][1]*0.001, elesizeyL*j*0.001, posLzxX[i][0]*0.001] for j in range(ndyL+1) for i in range(nnpLzxX)] # all nodes
@@ -257,7 +258,6 @@ def jintegral(step, l):
     # indexを削除する
     disLG = np.delete(np.loadtxt(fname=path+"/log/u_gl.l.dat", skiprows=1), obj=0, axis=1)
     acceLG = np.delete(np.loadtxt(fname=path+"/log/a.l.dat", skiprows=1), obj=0, axis=1)
-
     ndoflist = np.loadtxt(fname=path+"/ndof_list.txt")
 
     ndoflistX = [0] * nnpLX
@@ -324,6 +324,7 @@ def jintegral(step, l):
             ValueError("ndof is not 3 or 6")
 
     def _try(nL):
+        # logger.info(f"nL: {nL}")
         x0 = newposLX[nL-1][0]
         z0 = newposLX[nL-1][2]
         dx = -x0
@@ -342,8 +343,12 @@ def jintegral(step, l):
             pass
 
         idx = [_ for _ in range(len(numposLzx0X[aL])) if numposLzx0X[aL][_][0]==nL][0]
+        # logger.info(f"idx: {idx}, len posLzx0X[aL]: {len(posLzx0X[aL])}, len posLzx0X[aL+1]: {len(posLzx0X[aL+1])}")
         if len(posLzx0X[aL+1]) < len(posLzx0X[aL]):
-            angle = theta(posLzx0X[aL], posLzx0X[aL+1])[idx-1]
+            if idx-1>len(posLzx0[aL]):
+                return
+            else:
+                angle = theta(posLzx0X[aL], posLzx0X[aL+1])[idx-1]
         else:
             angle = theta(posLzx0X[aL], posLzx0X[aL+1])[idx]
 
@@ -361,29 +366,32 @@ def jintegral(step, l):
         for i in range(1, HL+2):
             for j in range(1, aL+lL+2):
                 for k in range(1, nposlist[j-1]*2):
-                    posLzx0xyz[n] = [j-aL-1, i-1, k-nposlist[j-1]-(nL-poscotip)]
+                    posLzx0xyz[n] = [j-aL-1, i-1, k-nposlist[j-1]]
                     n += 1
         posLzx0rz = [[
             math.sqrt(posLzx0xyz[i][0]**2 + posLzx0xyz[i][1]**2),
             abs(posLzx0xyz[i][2])
         ] for i in range(nnpL*2-(aL+lL+1)*(HL+1))]
 
-        # calculate q
+    
         
         qi0 = list(map(q0, posLzx0rz))
         qi0fornt = list(map(q0, [posLzx0rz[i] for i in front]))
 
         hL = const_local_mesh.hL
         meas = 0
-        for i in range(len(qi0fornt)):
+        for i in range(len(qi0fornt)-1):
             meas += sum(qi0fornt[i:i+2])*hL*0.0005
-        qe0 = list(map(sum, [[qi0[i-1] for i in l] for l in enLX]))
-        nq = []
 
-        for idx, val in enumerate(qe0):
+        qe0 = list(map(sum, [[qi0[i-1] for i in l] for l in enLX]))
+        # logger.info(f"qe0: {qe0}")
+        nq = []
+        for idx, val in zip(range(len(enLX)), qe0):
             if val > 10e-8: nq.append(idx)
+        # logger.info(f"nq: {nq}")
         
         elemq = [enLX[i] for i in nq]
+        # logger.info(f"elemq: {elemq}")
         enode = np.array([[xyz[i-1] for i in l] for l in elemq])
         
         ngp = jint.ngp
@@ -418,7 +426,7 @@ def jintegral(step, l):
             for j2, dnn in zip(j1, Dnn):
                 _.append(np.dot(np.linalg.inv(j2), dnn))
             bb.append(_)
-
+        # logger.info(f"bb: {bb[0][0]}") ok
         def uxyz(disp):
             ux = disp[0]*math.cos(angle) + disp[2]*math.sin(angle)
             uy = -disp[0]*math.sin(angle) + disp[2]*math.cos(angle)
@@ -439,6 +447,7 @@ def jintegral(step, l):
             aen = []
             for j in range(8):
                 idx = int(sum(ndoflistX[:elemq[i][j]-1])//3)
+                # logger.info(f"idx: {idx}")
                 if ndoflistX[elemq[i][j]-1] == 3:
                     d.append(dispR[idx])
                     a.append(acceR[idx])
@@ -457,10 +466,13 @@ def jintegral(step, l):
             acceqe.append(a)
             dispqerich.append(den)
             accerich.append(aen)
+
         accee = np.array([[np.dot(n, a)] for a in acceqe for n in nn]) + np.array([[np.dot(n, a)] for a in accerich for n in nn])
         epsbf = np.array([calc_eps(b, d) for b, d in zip(bb, dispqe)])
         epsenrich = np.array([calc_eps(b, d) for b, d in zip(bb, dispqerich)])
         eps = epsbf + epsenrich
+        # logger.info(f"eps: {eps[0]}")
+
         deltabf = np.array([[np.dot(de, e2) for e2 in e1] for e1 in epsbf])
         deltaenrich = np.array([[np.dot(de, e2) for e2 in e1] for e1 in epsenrich])
         delta = deltabf + deltaenrich
@@ -489,7 +501,6 @@ def jintegral(step, l):
             Jintsv.append(Jint0s(e,d,du,dq,dj))
         # logger.info(f"Jintsv: {Jintsv}")
         Jints = sum(Jintsv)
-        # logger.info(f"meas: {meas}")
         Jints /= meas
         # logger.info(f"Jints = {Jints}")
 
@@ -510,6 +521,7 @@ def jintegral(step, l):
             Jintdv.append(Jint0d(a,du,dj))
 
         Jintd = sum(Jintdv)
+        # logger.info(f"Jints: {Jints}, Jintd: {Jintd}")
 
         Jint = Jints + Jintd
 
