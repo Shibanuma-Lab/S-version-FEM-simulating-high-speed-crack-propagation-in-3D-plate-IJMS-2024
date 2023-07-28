@@ -6,9 +6,9 @@ hGMin = const_global_mesh.hGMin
 # hL = math.floor(hGMin/6*100)*0.01       # loal mesh size in the x direction[mm]
 hL = 0.30
 elesizeL = hL
-rxzL = 0.5      # ratio of x - z
+rxzL = 2      # ratio of x - z
 rxyL = 1        # ratio of x - y
-hLz = 15 / 20   # local mesh size in the z direction[mm]
+hLz = rxzL * hL # local mesh size in the z direction[mm]
 hLy = rxyL * hL # local mesh size in the y direction[mm]
 
 Localmag = 1
