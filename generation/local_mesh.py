@@ -264,7 +264,6 @@ class LocalMesh:
         horin = const_local_mesh.horin
         intin = const_local_mesh.intin
         verinmin = self.tip_x - verin
-        intin = 3
         horp = int(np.ceil(horin / intin)) + 1
         verp = int(np.ceil((2 * verin) / intin)) + 1
         NP = horp * verp

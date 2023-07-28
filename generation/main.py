@@ -6,7 +6,7 @@ from multiprocessing import Pool
 import shutil
 import argparse
 import time
-from const import simulation_params as sim_params
+from const import const_local_mesh, const_global_mesh, simulation_params as sim_params
 from initial import initial
 import global_mesh
 import local_mesh
@@ -56,7 +56,18 @@ def jint(step, l):
 
 def main():
     logger.info("SIMULATION START")
-
+    logger.info(f"hL: {const_local_mesh.hL}")
+    logger.info(f"hLy: {const_local_mesh.hLy}")
+    logger.info(f"aL, HL: {const_local_mesh.aL}, {const_local_mesh.HL}")
+    logger.info(f"MinhG: {const_global_mesh.hGMin}")
+    logger.info(f"MaxhG: {const_global_mesh.hGMax}")
+    logger.info(f"MinhGy: {const_global_mesh.hGyMin}")
+    logger.info(f"nGtheta1: {const_global_mesh.nGtheta1}")
+    logger.info(f"hGz: {15. / const_global_mesh.nGz1}")
+    logger.info(f"hG/HL > 6: {const_global_mesh.hGMin/const_local_mesh.hL}")
+    logger.info(f"aL/hG>2.83: {const_local_mesh.aL*const_local_mesh.hL/const_global_mesh.hGMax}")
+    logger.info(f"lL/hL>15: {const_local_mesh.lL}")
+    logger.info(f"HL/hG>1.2: {const_local_mesh.HL*const_local_mesh.hLy/const_global_mesh.hGyMin}")
     logger.info(os.getcwd())
 
     argparser = argparse.ArgumentParser()

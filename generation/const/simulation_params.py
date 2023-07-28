@@ -1,6 +1,6 @@
 import datetime
 
-TEST_NUMBER_LIST = [2]
+TEST_NUMBER_LIST = [4]
 TEST_NUMBER = TEST_NUMBER_LIST[0]
 INC_LIST = [1]
 DIR_NAME_ADD_LIST = ["R0.8_No.1", "R0.8_No.2", "R1.0_No.1", "R1.0_No.2", "R1.2_No.1", "R1.2_No.2"]

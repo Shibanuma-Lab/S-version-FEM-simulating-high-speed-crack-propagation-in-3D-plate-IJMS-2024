@@ -10,7 +10,7 @@ def generate(step) -> None:
     velhis = experiments_data.velhis
     velcoint = experiments_data.velcoint
     REstart = sim_params.REstart
-    Local01 = sim_params.Local01
+    Local01 = const_local_mesh.Local01
     if step == 0:
         REstart = 0
     # input data の作成

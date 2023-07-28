@@ -32,3 +32,5 @@ ndyL = HL
 verin = Wint
 intin = Inint
 horin = Hint
+
+Local01 = 1
