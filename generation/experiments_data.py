@@ -13,9 +13,9 @@ coefhis = pd.read_excel(f"experiments_data/{data[2]}", header=None, index_col=No
 nimg = coefhis.shape[0]
 nterm = coefhis.shape[1]
 coeft = [[(coefhis[i, nterm-1], coefhis[:, j][i]) for i in range(nfcoef-1, nimg)] for j in range(nterm)]
-coefcoint = [interp1d([row[0] for row in coeft[i]], [row[1] for row in coeft[i]], kind="cubic") for i in range(nterm)]
+coefcoint = [interp1d([row[0] for row in coeft[i]], [row[1] for row in coeft[i]], kind="cubic", fill_value='extrapolate') for i in range(nterm)]
 velhis = pd.read_excel(f"experiments_data/{data[3]}",  header=None, index_col=None).to_numpy()
-velcoint = interp1d(velhis[:,0], velhis[:, 1], kind="cubic")
+velcoint = interp1d(velhis[:,0], velhis[:, 1], kind="cubic", fill_value='extrapolate')
 ctod = float(data[4]) * 0.001
 cross01 = int(data[5])
 hole = float(data[6])
