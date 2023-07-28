@@ -3,17 +3,25 @@ from const import const_jintegral as j
 from const import simulation_params as sim_params
 from const import const_local_mesh
 from utils.logger import logger
+import experiments_data
 
 def generate(step) -> None:
+    postipx = const_local_mesh.elesizeL * step - 35
+    velhis = experiments_data.velhis
+    velcoint = experiments_data.velcoint
     REstart = sim_params.REstart
+    Local01 = sim_params.Local01
     if step == 0:
         REstart = 0
     # input data の作成
+    v = velhis[0][1] if velhis[0][0] > postipx else velcoint(-35+const_local_mesh.elesizeL*(step-1))
+    deltat = 2./v if Local01 == 0 else (const_local_mesh.elesizeL*0.001/v if v>0 else 1.)
+    dt = deltat/j.inc
     input_data = [       
             [2, "\t!>solutiontype(1:static 2:dynamic)"],
             [0, "\t!>isNLgeom(0:off 1:on)"],
             [5, "\t!> max NR step"],
-            [sim_params.STEP_TIME, "\t!> dt"],
+            [dt, "\t!> dt"],
             [1, "\t!>max time step"],
             [j.inc, "\t!> nincrement"],
             [j.ee, "\t!> young 率"],
