@@ -1,7 +1,11 @@
 import math
 import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
 from const import const_local_mesh, simulation_params as sim_params, const_jintegral
 from utils import step2str
+def Kv(v):
+    return (5.99825e-4 * (v / 100) ** 10 + 0.0779521 * (v / 100) ** 2 + 1.6154) * 100
 
 def getvJ(step):
     str_step = step2str.step2str(step)
@@ -59,10 +63,17 @@ def getvJ(step):
     K = [Kcal(J_val, v_val) / 10 ** 4 for J_val, v_val in zip(Jlist, velfrontlist)]
     vKcal = list(zip(velfrontlist, K))
 
-    def Kv(v):
-        return (5.99825e-4 * (v / 100) ** 10 + 0.0779521 * (v / 100) ** 2 + 1.6154) * 100
-
+    
     return [(v, Kv(v)) for v in velfrontlist]
+
+def getdata():
+    data1 = pd.read_excel("experiments_data/vel_J_1.xlsx", header=None, index_col=None).to_numpy()
+    data2 = pd.read_excel("experiments_data/vel_J_2.xlsx", header=None, index_col=None).to_numpy()
+
+    data1 = [(v, Kv(v)) for v in data1[:, 0]]
+    data2 = [(v, Kv(v)) for v in data2[:, 0]]
+
+    return data1, data2
 
 if __name__ == "__main__":
     print(f"testname: {sim_params.DIR_NAME_TEST}")
@@ -77,7 +88,12 @@ if __name__ == "__main__":
             x, y = zip(*l)
         else:
             continue
-        plt.scatter(x, y)
+        plt.scatter(x, y, c="blue", s=1)
+
+    data1, data2 = getdata()
+    plt.scatter([v[0] for v in data1], [v[1] for v in data1], c="red", s=1)
+    plt.scatter([v[0] for v in data2], [v[1] for v in data2], c="yellow", s=1)
+
     plt.xlabel("v")
     plt.ylabel("K")
     plt.savefig("K.png")
