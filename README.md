@@ -56,7 +56,7 @@ chmod +xr ./install_lib.sh
 ## Run the code
 Run main.py from the generation directory.
 ```
-pipenv run python3 main.py
+pipenv run python3 main.py --step_start 0 --step_end 300
 ```
 The command is below.
 ```
