@@ -8,7 +8,6 @@ from const import simulation_params as sim_params
 from utils.step2str import step2str
 from utils.theta import theta
 from utils.logger import logger
-from mpmath import mp
 
 def q0(i: List[float]) -> float:
     """ input: i = [R, W]
