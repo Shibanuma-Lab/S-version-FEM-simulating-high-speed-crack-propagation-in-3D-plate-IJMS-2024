@@ -456,7 +456,7 @@ def jintegral(step, l):
             _ = []
             for j2, dnn in zip(j1, Dnn):
                 j2 = np.array(j2, dtype=np.float64)
-                logger.info(f"j2: {np.dot(j2, np.linalg.pinv(j2))}")
+                # logger.info(f"j2: {np.dot(j2, np.linalg.pinv(j2))}")
                 _.append(np.dot(np.linalg.pinv(j2), dnn))
             bb.append(_)
         # logger.info("bb: {}".format(np.array(bb))) # ok

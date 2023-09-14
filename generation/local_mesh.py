@@ -8,7 +8,6 @@ import experiments_data
 from const import simulation_params as sim_params
 from const import const_local_mesh
 from const import const_jintegral as j
-# from get_bisect import get_bisect
 from utils.logger import logger
 
 nterm = experiments_data.nterm
