@@ -17,15 +17,18 @@ def run(step):
     try:
         os.mkdir(f"Newton/{dirnametest}")
     except:
-        logger.error("Did NOT make directory")
+        # logger.error("Did NOT make directory")
+        pass
     try:
         os.mkdir(f"Newton/{dirnametest}/{day}")
     except:
-        logger.error("Did NOT make directory")
+        # logger.error("Did NOT make directory")
+        pass
     try:
         os.mkdir(f"Newton/{dirnametest}/{day}/step{str_step}")
     except:
-        logger.error("Did NOT make directory")
+        # logger.error("Did NOT make directory")
+        pass
     
     subprocess.run([f"cp", "-r", f"inputfiles/step{str_step}",  f"../{reponame}/example"])
     subprocess.run([f"chmod", "+xr", f"../{reponame}/bin/sfem_linear"])

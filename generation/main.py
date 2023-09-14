@@ -89,7 +89,7 @@ def main():
 
     step_start = args.step_start
     step_last = args.step_end
-    INTERM = 100
+    INTERM = 0
     STEP_LAST = 300
     REstart = 0 if step_start == INTERM else 1  # 1:restart from dynamic analysis
     logger.info(f"REstart: {REstart}")
@@ -148,7 +148,7 @@ def main():
                 if step >= 3:
                     Jlist = jintegral(step, l)
                     logger.info(f"Jlist: {Jlist}")
-                logger.info(f"Jlist: {Jlist}")
+                # logger.info(f"Jlist: {Jlist}")
 
 if __name__ == "__main__":
     main()

@@ -32,13 +32,13 @@ def generate(step, REstart, INTERM) -> None:
             [j.Beta_l, "\t!> Rk for Rayleigh damping for mass"],
             [2, "\t!> local mesh integral point (not used)"],
             [sim_params.HREF, "\t!> local mesh h-refine"],
-            [REstart, "\t!> is_Restart (0:off, 1:on)"],
+            [1, "\t!> is_Restart (0:off, 1:on)"],
             [2, "\t!> XFEM(1:global, 2:local)"],
             [0.015, "\t!> thickness"],
             [sim_params.OPENMP, "\t!> the number of OpenMP threads"]
         ]
     if step == (step if sim_params.DYNAMIC_01_LIST[0] == 0 else INTERM) and REstart == 0:
         logger.info("step: {} :: input.dat static".format(step))
-        input_data[15][0] = 0
-        input_data[0][0] = 1
+        input_data[15][0] = 0 # is_Restart
+        input_data[0][0] = 1 # solutiontype
     np.savetxt("input.dat", input_data, fmt="%s")
