@@ -18,7 +18,7 @@ from jintegral import jintegral
 from utils.logger import logger
 from utils.step2str import step2str
 
-def makemeshs(step):
+def makemeshs(step, REstart, INTERM):
     logger.info(os.getcwd())
     str_step = step2str(step)
     try:
@@ -41,9 +41,9 @@ def makemeshs(step):
     b.define_local_boundary(l)
     logger.info(f"step: {step} :: Generate Boundary")
     b.generate()
-    input_generator.generate(step)
+    input_generator.generate(step, REstart, INTERM)
     load_generator.generate()
-    if step >= 1 + sim_params.INTERM or sim_params.REstart == 1:
+    if step >= 1 + INTERM or REstart == 1:
         init = initial(step, l, g)
     os.chdir("../../")
     return l, g
@@ -73,8 +73,8 @@ def main():
     argparser = argparse.ArgumentParser()
     argparser.add_argument("--test_start", type=int, default=sim_params.TEST_START, help="")
     argparser.add_argument("--test_end", type=int, default=sim_params.TEST_END, help="")
-    argparser.add_argument("--step_start", type=int, default=sim_params.STEP_START, help="")
-    argparser.add_argument("--step_end", type=int, default=sim_params.STEP_LAST, help="")
+    argparser.add_argument("--step_start", type=int, default=0, help="")
+    argparser.add_argument("--step_end", type=int, default=1000, help="")
     argparser.add_argument("--delete", type=bool, default=False, help="if Ture, delete all files in inputfiles and results. (default: False)")
     argparser.add_argument("--debugmode", type=bool, default=False, help="if True, run in debug mode. (default: False)")
     argparser.add_argument("--particular", type=bool, default=False, help="if True, run in particular step. (default: False)")
@@ -87,17 +87,24 @@ def main():
     test_end = args.test_end
     user_name = sim_params.USER_NAME
 
+    step_start = args.step_start
+    step_last = args.step_end
+    INTERM = 100
+    STEP_LAST = 300
+    REstart = 0 if step_start == INTERM else 1  # 1:restart from dynamic analysis
+    logger.info(f"REstart: {REstart}")
+
     for test in range(test_start, test_end + 1):
         if args.debugmode:
             if args.particular:
                 step = int(input("---- step: "))
-                l, g = makemeshs(step)
+                l, g = makemeshs(step, REstart, INTERM)
                 if args.is_jonly:
                     if step >= 3:
                         Jlist = jintegral(step, l)
                         logger.info(f"Jlist: {Jlist}")
                 else:
-                    if step >= 1 + sim_params.INTERM or sim_params.REstart == 1:
+                    if step >= 1 + INTERM or REstart == 1:
                         init = initial(step, l)
                     if args.is_meshonly:
                         break
@@ -106,17 +113,15 @@ def main():
                         Jlist = jintegral(step, l)
                         logger.info(f"Jlist: {Jlist}")
             else:
-                step_start = args.step_start
-                step_last = args.step_end
                 step_list = range(step_start, step_last)
                 for step in step_list:
-                    l, g = makemeshs(step)
+                    l, g = makemeshs(step, REstart, INTERM)
                     if args.is_jonly:
                         if step >= 3:
                             Jlist = jintegral(step, l)
                             logger.info(f"Jlist: {Jlist}")
                         continue
-                    if step >= 1 + sim_params.INTERM or sim_params.REstart == 1:
+                    if step >= 1 + INTERM or REstart == 1:
                         init = initial(step, l, g)
                     if args.is_meshonly:
                         continue
@@ -129,9 +134,20 @@ def main():
             step_last = args.step_end
             step_list = range(step_start, step_last)
             for step in step_list:
-                l, g = makemeshs(step)
+                l, g = makemeshs(step, REstart, INTERM)
+                if args.is_jonly:
+                    if step >= 3:
+                        Jlist = jintegral(step, l)
+                        logger.info(f"Jlist: {Jlist}")
+                    continue
+                if step >= 1 + INTERM or REstart == 1:
+                    init = initial(step, l, g)
+                if args.is_meshonly:
+                    break
                 linux_command.run(step)
-                Jlist = jintegral(step, l)
+                if step >= 3:
+                    Jlist = jintegral(step, l)
+                    logger.info(f"Jlist: {Jlist}")
                 logger.info(f"Jlist: {Jlist}")
 
 if __name__ == "__main__":

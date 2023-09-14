@@ -1,4 +1,5 @@
 import math
+import os
 from scipy import optimize
 import sys
 import pickle
@@ -10,7 +11,11 @@ from utils.step2str import step2str
 from utils.logger import logger
 
 def initial(step: int, l, g) -> None:
-    REstart = sim_params.REstart
+    if os.path.dirname(os.getcwd()) != "generation":
+        logger.info(os.path.dirname(os.getcwd()))
+        os.chdir(f"/home/lab/S-method-dynamic-crack-propgation-3D-plate/generation")
+    logger.info(os.getcwd())
+    # REstart = sim_params.REstart
     if step == 0:
         return
     posL = l.node
@@ -93,20 +98,20 @@ def initial(step: int, l, g) -> None:
     user_name = sim_params.USER_NAME
     repo_name = sim_params.REPO_NAME
     dirnametest = sim_params.DIR_NAME_TEST
-    interm = sim_params.INTERM
-    str_step_pre = step2str(step-interm-1)
-    import os
-    path = f"../step{str_step_pre}/"
+    day = sim_params.DAY
+
+    # interm = sim_params.INTERM
+    str_step_pre = step2str(step-1)
+    path = f"Newton/{dirnametest}/{day}/step{str_step_pre}/"
     with open(path+"local_mesh.pickel", "rb") as f:
         l_bf = pickle.load(f)
     posLzxps = l_bf.node_zx
     nnpLzxps = len(posLzxps)
     enLzxps = l_bf.enLzx
     nelLzxps = len(enLzxps)
-
-    day = sim_params.DAY
+    
     str_step = step2str(step-1)
-    path = f"../../Newton/{dirnametest}/{day}/step{str_step}/"
+    path = f"Newton/{dirnametest}/{day}/step{str_step_pre}/"
     ndoflistpsL = []
     with open(path+"ndof_list.txt", "r") as f:
         lines = f.readlines()
@@ -127,7 +132,7 @@ def initial(step: int, l, g) -> None:
 
     def load(filename):
         ans = []
-        path = f"../../Newton/{dirnametest}/{day}/step{str_step}/"
+        path = f"Newton/{dirnametest}/{day}/step{str_step_pre}/"
         with open(path+filename, "r") as f:
             lines = f.readlines()
             for line in lines[1:]:
@@ -135,7 +140,7 @@ def initial(step: int, l, g) -> None:
         return ans
 
     try:
-        disG = load("log/u.g.dat")
+        disG = load("log/u.g.dat") # ok
     except:
         logger.info(f"load log/u.g_{str_step}.dat")
         disG = load(f"log/u.g_{str_step}.dat")
@@ -310,6 +315,10 @@ def initial(step: int, l, g) -> None:
                 line = [str(b) if b != 0. or b != 0 else "0." for b in array[i]]
                 f.write(f"{int(i)+1}\t{line[0]}\t{line[1]}\t{line[2]}\n")
         f.close()
+    
+    logger.info(os.getcwd())
+    os.chdir(f"inputfiles/step{str_step}/")
+    logger.info(os.getcwd())
 
     write("init.u.g.dat", disiniG)
     write("init.u.l.dat", disiniL)
@@ -318,4 +327,6 @@ def initial(step: int, l, g) -> None:
     write("init.a.g.dat", acceiniG)
     write("init.a.l.dat", acceiniL)
     
-    return
+    os.chdir("../../")
+
+    return None

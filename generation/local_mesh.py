@@ -1,18 +1,24 @@
 import numpy as np
 import math
 from scipy import interpolate
-from scipy.optimize import fsolve, root_scalar
+from scipy.optimize import fsolve, root_scalar, root
 from typing import List
 import pickle
 import experiments_data
 from const import simulation_params as sim_params
 from const import const_local_mesh
 from const import const_jintegral as j
+# from get_bisect import get_bisect
 from utils.logger import logger
+from decimal import *
 
 nterm = experiments_data.nterm
 
 def solve_z(zpos: float, th: float, xpos: float, a: List[float], h :float) -> float:
+    # h = Decimal(str(h))
+    # xpos = Decimal(str(xpos))
+    # zpos = Decimal(str(zpos))
+    # th = Decimal(str(th))
     if nterm == 5:
         def f(z):
             return (a[0]*z**4 + a[1]*z**3 + a[2]*z**2 + a[3]*z + a[4] - xpos)**2 + (z - zpos)**2 - h**2
@@ -24,10 +30,15 @@ def solve_z(zpos: float, th: float, xpos: float, a: List[float], h :float) -> fl
             return (a[0]*z**2 + a[1]*z + a[2] - xpos)**2 + (z - zpos)**2 - h**2
     elif nterm == 2:
         def f(z):
+            # a[0] = Decimal(str(a[0]))
+            # a[1] = Decimal(str(a[1]))
+            # z = Decimal(str(z))
             return (a[0]*z**2 + a[1] - xpos)**2 + (z - zpos)**2 - h**2
     else:
         logger.error("--nterm is 2,3,4,5")
     sol = root_scalar(f, bracket=[zpos, th], method="bisect")
+    # solb = get_bisect(f, zpos, th)
+    # logger.info(f"sol: {sol.root}, solb: {solb}")
     return sol
 
 def solve_zb(a:list, b:list, p:list):
@@ -104,22 +115,26 @@ def solve_zi(a, p):
             return ((p[1]-(a[0]*z**2+a[1])))*(2*a[0]*z) + (p[0]-z)
     else:
         logger.error("nterm is 2,3,4,5")
-    sol = root_scalar(f, bracket=[0, 100], method="bisect")
+    sol = root_scalar(f, bracket=[-100, 100], method="bisect")
     return sol
 
 def solve_zcf2(p, co, elesizeL, disinf):
     def f(z):
         return disinf(z, p[1] + (p[0] - z)/(2*co[0]*p[0]))[0] - 2*elesizeL
-    z = fsolve(f, x0=p[0], xtol=1e-10)[0]
+    # logger.info(root(f, x0=p[0]).x)
+    z = root(f, x0=p[0]).x[0]
     return z
 
 def solve_zcf22(pz, elesizeL, disinf, postip2x):
     def f(x):
         return disinf([pz], x)[0] - 2*elesizeL
-    x = fsolve(f, x0=postip2x, xtol=1e-10)[0]
+    x = root(f, x0=postip2x).x[0]
     return x
 
 def fa(a: List[float], z: float) -> float:
+    # a[0] = Decimal(str(a[0]))
+    # a[1] = Decimal(str(a[1]))
+    # z = Decimal(str(z))
     if nterm == 5:
         return a[0]*z**4 + a[1]*z**3 + a[2]*z**2 + a[3]*z + a[4]
     elif nterm == 4:
@@ -146,6 +161,7 @@ def levelset(a, pos, tip_x):
     else:
         z = solve_zi(a, pos).root
         sol = ((pos[0] - z)**2 + (pos[1] - fa(a, z))**2)**0.5
+        # logger.info(f"\nz: {z}, \npos: {pos}, \nsol: {sol}")
     if pos[1] < fa(a, pos[0]):
         sol = -sol
     return sol
@@ -268,10 +284,11 @@ class LocalMesh:
         verp = int(np.ceil((2 * verin) / intin)) + 1
         NP = horp * verp
 
-        posI = np.array([[intin * i, verinmin + intin * j] for j in range(verp) for i in range(horp)])
+        posI = np.array([[intin * i, verinmin + intin * j] for j in range(-verp, verp+1) for i in range(-horp, horp+1)])
         x_inp = posI[:, 0]
         y_inp = posI[:, 1]
-        z_inp = [levelset(self.cotip, posI[i], self.tip_x) for i in range(NP)]
+        z_inp = [levelset(self.cotip, posI[i], self.tip_x) for i in range(len(posI))]
+        # logger.info(f"z_inp: {z_inp}")
         
         self.disinf = interpolate.Rbf(x_inp, y_inp, z_inp, kind='cubic')
 
@@ -286,6 +303,7 @@ class LocalMesh:
             solcf2 = solve_zcf2(self.crack_front_2_node[n], self.cotip1, const_local_mesh.elesizeL, self.disinf)
             self.crack_front_3_node[n][0] = solcf2
             self.crack_front_3_node[n][1] = solve_zcf22(solcf2, const_local_mesh.elesizeL, self.disinf, postip2x)
+            # logger.info(f"n: {n}, {self.crack_front_3_node[n]}")
             n += 1
 
     def _calc_front_node(self):

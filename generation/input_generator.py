@@ -5,11 +5,10 @@ from const import const_local_mesh
 from utils.logger import logger
 import experiments_data
 
-def generate(step) -> None:
+def generate(step, REstart, INTERM) -> None:
     postipx = const_local_mesh.elesizeL * step - 35
     velhis = experiments_data.velhis
     velcoint = experiments_data.velcoint
-    REstart = sim_params.REstart
     Local01 = const_local_mesh.Local01
     if step == 0:
         REstart = 0
@@ -38,7 +37,7 @@ def generate(step) -> None:
             [0.015, "\t!> thickness"],
             [sim_params.OPENMP, "\t!> the number of OpenMP threads"]
         ]
-    if step == (step if sim_params.DYNAMIC_01_LIST[0] == 0 else sim_params.INTERM) and REstart == 0:
+    if step == (step if sim_params.DYNAMIC_01_LIST[0] == 0 else INTERM) and REstart == 0:
         logger.info("step: {} :: input.dat static".format(step))
         input_data[15][0] = 0
         input_data[0][0] = 1

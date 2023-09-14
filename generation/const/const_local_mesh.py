@@ -18,7 +18,7 @@ lL = 15                                                                 # (Local
 
 Wint = 30.      # width of interpolation
 Hint = 30.      # height of interpolation
-Inint = 3.0     # interval of interpolation
+Inint = 1.0     # interval of interpolation
 
 delz = 0.00001  # delta z
 delx = 0.00001  # delta x

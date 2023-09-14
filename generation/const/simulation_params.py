@@ -30,16 +30,12 @@ ABO = 0  # 1:abort just before calculation of solver
 USER_NAME = "lab"
 REPO_NAME = "sfem_linear"
 
-REstart = 1  # 1:restart from dynamic analysis
-STEP_START = 0
-INTERM = 0
-STEP_LAST = 300
 STEP_TIME = 1.2915155311516764e-6
 
 OUTPUT_FOLDER = "outputfolder"
 CALC_STEP = 1
-JOB_NAME = "step_" + str(STEP_START) + "_exp_" + str(CALC_STEP)
-FOLDER_NAME = JOB_NAME
+# JOB_NAME = "step_" + str(STEP_START) + "_exp_" + str(CALC_STEP)
+# FOLDER_NAME = JOB_NAME
 
 is_cross = False
 isgetctod = False

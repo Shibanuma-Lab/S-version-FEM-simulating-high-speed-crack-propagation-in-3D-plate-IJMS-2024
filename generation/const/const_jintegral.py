@@ -20,5 +20,5 @@ ee = 3.2e9  # Young's modulus [Pa]
 Rho = 1170. # density [m/s^2]
 
 Alpha_l = 0.
-Beta_l = 4.5066005248551814e-7
+Beta_l = 4.6620005429536353e-7
 

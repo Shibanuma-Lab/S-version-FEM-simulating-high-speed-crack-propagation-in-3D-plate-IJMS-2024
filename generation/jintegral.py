@@ -1,4 +1,5 @@
 import numpy as np
+import os
 import math
 from typing import List
 from const import const_local_mesh
@@ -68,7 +69,6 @@ def shp(psietazeta: List[float]) -> List[float]:
     """ input: psi, eta, zeta
         output: N = [N1, N2, N3, N4, N5, N6, N7, N8]
     """
-    # TODO: check
     psi = psietazeta[0]
     eta = psietazeta[1]
     zeta = psietazeta[2]
@@ -151,7 +151,10 @@ def calc_Dq(bb, qi):
     """" Calculate displacement gradient """
     _ = []
     for b1 in bb:
-        _.append([np.dot(b2, qi) for b2 in b1])
+        _2 = []
+        for b2 in b1:
+            _2.append(np.dot(b2, qi))
+        _.append(_2)
     return _
 
 def flatten(array):
@@ -179,9 +182,12 @@ def jintegral(step, l):
             else:
                 _[j] = [sym_posLzx0[j][0], sym_posLzx0[j][1]]
         posLzx0X[i] = _
+
+    # logger.info("posLzx0X: {}".format(posLzx0X[0][:10]))
     
     nposLzxX = [len(posLzx0X[i]) for i in range(len(posLzx0X))] # number of nodes of crack line
     posLzxX = flatten(posLzx0X) # all nodes
+    # logger.info(f"posLzxX: {np.array(posLzxX)}")
     nnpLzxX = len(posLzxX) # number of all nodes
     
     nback = const_local_mesh.nback
@@ -214,7 +220,9 @@ def jintegral(step, l):
 
     elesizeyL = const_local_mesh.elesizeyL
     newposLX = [[posLzxX[i][1]*0.001, elesizeyL*j*0.001, posLzxX[i][0]*0.001] for j in range(ndyL+1) for i in range(nnpLzxX)] # all nodes
+    # logger.info(f"newposLX: {np.array(newposLX)}")
     nnpLX = len(newposLX) # number of all nodes
+    
 
     aL = const_local_mesh.aL # -1: from number to index
     hLz = const_local_mesh.hLz
@@ -252,9 +260,13 @@ def jintegral(step, l):
     dirname = sim_params.UBUNTU_DIR
     dirnametest = sim_params.DIR_NAME_TEST
     day = sim_params.DAY
+    if os.path.dirname(os.getcwd()) != "generation":
+        logger.info(os.path.dirname(os.getcwd()))
+        os.chdir(f"/home/lab/S-method-dynamic-crack-propgation-3D-plate/generation")
     path = f"Newton/{dirnametest}/{day}/step{str_step}"
 
     disLG = np.delete(np.loadtxt(fname=path+"/log/u_gl.l.dat", skiprows=1), obj=0, axis=1)
+    # logger.info(f"disLG: {disLG[:200]}")
     acceLG = np.delete(np.loadtxt(fname=path+"/log/a.l.dat", skiprows=1), obj=0, axis=1)
     ndoflist = np.loadtxt(fname=path+"/ndof_list.txt")
 
@@ -320,7 +332,8 @@ def jintegral(step, l):
             num += 2
         else:
             ValueError("ndof is not 3 or 6")
-
+    np.set_printoptions(threshold=100000)
+    # logger.info(f"disLGX: {np.array(disLGX)}")
     def _try(nL):
         x0 = newposLX[nL-1][0]
         z0 = newposLX[nL-1][2]
@@ -340,6 +353,7 @@ def jintegral(step, l):
             pass
 
         idx = [_ for _ in range(len(numposLzx0X[aL])) if numposLzx0X[aL][_][0]==nL][0]
+        
         if len(posLzx0X[aL+1]) < len(posLzx0X[aL]):
             if idx-1>len(posLzx0[aL]):
                 logger.error("idx-1>len(posLzx0[aL])")
@@ -349,9 +363,15 @@ def jintegral(step, l):
         else:
             angle = theta(posLzx0X[aL], posLzx0X[aL+1])[idx]
 
+        # logger.info(f"angle: {angle}")
+        # logger.info(f"dx: {dx}, dz: {dz}")
+        # logger.info(f"newposLX: {newposLX[:10]}")
+
+        # logger.info(np.cos(angle))
+
         xyz = [[
-            math.cos(angle)*_[0] + math.sin(angle)*_[2] + math.cos(angle)*dx + math.sin(angle)*dz,
-            -math.sin(angle)*_[0] + math.cos(angle)*_[2] - math.sin(angle)*dx + math.cos(angle)*dz,
+            np.cos(angle)*_[0] + np.sin(angle)*_[2] + np.cos(angle)*dx +  np.sin(angle)*dz,
+            -np.sin(angle)*_[0] + np.cos(angle)*_[2] - np.sin(angle)*dx + np.cos(angle)*dz,
             _[1]
         ] for _ in newposLX]
 
@@ -370,15 +390,20 @@ def jintegral(step, l):
             abs(posLzx0xyz[i][2])
         ] for i in range(nnpL*2-(aL+lL+1)*(HL+1))]
 
+        # logger.info("posLzx0rz: {}".format(posLzx0rz[:10])) ok
+
         # calculate q
         
         qi0 = list(map(q0, posLzx0rz))
+        # logger.info("qi0: {}".format(qi0)) ok
         qi0fornt = list(map(q0, [posLzx0rz[i] for i in front]))
+        # logger.info("qi0fornt: {}".format(qi0fornt)) ok
 
         hL = const_local_mesh.hL
         meas = 0
         for i in range(len(qi0fornt)-1):
             meas += sum(qi0fornt[i:i+2])*hL*0.0005
+        # logger.info("meas: {}".format(meas)) ok
         qe0 = list(map(sum, [[qi0[i-1] for i in l] for l in enLX]))
         nq = []
 
@@ -387,21 +412,36 @@ def jintegral(step, l):
         
         elemq = [enLX[i] for i in nq]
         enode = np.array([[xyz[i-1] for i in l] for l in elemq])
-        
+        # logger.info(f"elemq: {np.array(elemq)}")
+        # logger.info("enode: {}".format(enode))
         ngp = jint.ngp
         psietazeta = [[k, j, i] for i in GP(ngp) for j in GP(ngp) for k in GP(ngp)]
-        weight = flatten([[k, j, i] for i in GW(ngp) for j in GW(ngp) for k in GW(ngp)])
+        weight = flatten([[k* j* i] for i in GW(ngp) for j in GW(ngp) for k in GW(ngp)])
+        # logger.info("psietazeta: {}".format(psietazeta[:10]))
+        # logger.info("weight: {}".format(weight))
         nn = np.array(list(map(shp, psietazeta)))
+        # logger.info(f"nn: {nn}") ok
+        # logger.info(f"psi: {psietazeta}")
         Dnn = np.array(list(map(Dshp, psietazeta)))
 
         J = []
         detJ = []
+        # logger.info("enode: {}".format(enode))
+        # logger.info("Dnn: {}".format(Dnn))
+
+        # enode, Dnn is maybe same
+        # process of calculating detJ has problem? detJ[-1] is not same
+        # research about np.linalg.detJ
         for e in enode:
             j = []
             for d in Dnn:
+                d = np.array(d, dtype=np.float64)
+                e = np.array(e, dtype=np.float64)
                 j.append(np.dot(d, e))
+            j = np.array(j, dtype=np.float64)
             J.append(j)
-            detJ.append(-np.linalg.det(j))
+            detJ.append(-np.linalg.det(j*10**3)*10**-9)
+        # logger.info("detJ: {}".format(detJ)) 
 
         EE = jint.ee
         nu = jint.Nu
@@ -415,11 +455,15 @@ def jintegral(step, l):
         ])
 
         bb = []
+        # logger.info(f"Dnn: {Dnn}")
+        # logger.info(f"J: {J}")
         for j1 in J:
             _ = []
             for j2, dnn in zip(j1, Dnn):
-                _.append(np.dot(np.linalg.inv(j2), dnn))
+                j2 = np.array(j2, dtype=np.float64)
+                _.append(np.dot(np.linalg.pinv(j2), dnn))
             bb.append(_)
+        # logger.info("bb: {}".format(np.array(bb))) # ok
 
         def uxyz(disp):
             ux = disp[0]*math.cos(angle) + disp[2]*math.sin(angle)
@@ -428,11 +472,14 @@ def jintegral(step, l):
             return [ux, uy, uz]
         
         dispR = list(map(uxyz, disLGX))
+        # logger.info("dispR: {}".format(dispR[:10]))  ok
         acceR = list(map(uxyz, acceLGX))
         dispqe = []
         acceqe = []
         dispqerich = []
         accerich = []
+
+        # logger.info("dispR: {}".format(np.array(dispR))) # ok
 
         for i in range(len(elemq)):
             d = []
@@ -442,6 +489,9 @@ def jintegral(step, l):
             for j in range(8):
                 idx = int(sum(ndoflistX[:elemq[i][j]-1])//3)
                 if ndoflistX[elemq[i][j]-1] == 3:
+                    # logger.info(idx) ok
+                    logger.info(f"dispR: {dispR[idx]}")
+                    logger.info(f"acceR: {acceR[idx]}")
                     d.append(dispR[idx])
                     a.append(acceR[idx])
                     den.append([0., 0., 0.])
@@ -459,10 +509,15 @@ def jintegral(step, l):
             acceqe.append(a)
             dispqerich.append(den)
             accerich.append(aen)
-        accee = np.array([[np.dot(n, a)] for a in acceqe for n in nn]) + np.array([[np.dot(n, a)] for a in accerich for n in nn])
+        # logger.info("dispqe: {}".format(np.array(dispqe))) # NG
+
+        accee = np.array([[np.dot(n, a) for a in acceqe] for n in nn]) + np.array([[np.dot(n, a) for a in accerich] for n in nn])
+        logger.info(f"accee: {accee}") # NG
+
         epsbf = np.array([calc_eps(b, d) for b, d in zip(bb, dispqe)])
         epsenrich = np.array([calc_eps(b, d) for b, d in zip(bb, dispqerich)])
         eps = epsbf + epsenrich
+
         deltabf = np.array([[np.dot(de, e2) for e2 in e1] for e1 in epsbf])
         deltaenrich = np.array([[np.dot(de, e2) for e2 in e1] for e1 in epsenrich])
         delta = deltabf + deltaenrich
@@ -472,7 +527,22 @@ def jintegral(step, l):
         Du = Dubf + Duenrich
 
         qie = [[qi0[i-1] for i in l] for l in elemq]
+        # logger.info(f"qie: {qie[0]}")
+        # logger.info(f"bb: {bb}")
         Dq = np.array([calc_Dq(b, d) for b, d in zip(bb, qie)])
+        # logger.info(f"Dq: {Dq[0]}")
+
+        # logger.info(f"epsbf: {epsbf[0]}")
+        # logger.info(f"epsenrich: {epsenrich[0]}")
+        # logger.info(f"eps: {eps[0]}")
+        # logger.info(f"deltabf: {deltabf[0]}")
+        # logger.info(f"deltaenrich: {deltaenrich[0]}")
+        # logger.info(f"delta: {delta[0]}")
+        logger.info(f"Dubf: {Dubf[0]}")
+        # logger.info(f"Duenrich: {Duenrich[0]}")
+        # logger.info(f"Du: {Du}")
+
+        
 
         def Jint0s(eps, delta, Du, Dq, detJ):
             _ = []
@@ -486,11 +556,15 @@ def jintegral(step, l):
                 )
             return sum(_)
         
-        Jintsv = []
+        Jintsv = [] 
+        c = 0
         for e, d, du, dq, dj in zip(eps,delta,Du,Dq,detJ):
             Jintsv.append(Jint0s(e,d,du,dq,dj))
+        # logger.info(f"Jintsv: {Jintsv}")
         Jints = sum(Jintsv)
+        
         Jints /= meas
+        logger.info(f"Jints: {Jints}")
 
         rho = jint.Rho
         def Jint0d(acce, Du, detJ):
@@ -498,16 +572,20 @@ def jintegral(step, l):
             for a, du, dj, w in zip(acce, Du, detJ, weight):
                 _.append(
                     (
-                    (a[0]*du[0] + a[1]*du[1] + a[2]*du[2]) * rho * np.array(dj) * w
+                    (a[0]*du[0] + a[1]*du[1] + a[2]*du[2]) * rho * dj * w
                     )
                 )
             return sum(_)
-        
+        # logger.info()
         Jintdv = []
+        # logger.info(f"accee: {accee}")
+        # logger.info(f"Du: {Du}")
+        # logger.info(f"detJ: {detJ}")
         for a, du, dj in zip(accee, Du, detJ):
             Jintdv.append(Jint0d(a,du,dj))
-
+        # logger.info(f"Jintdv: {Jintdv}")
         Jintd = sum(Jintdv)
+        logger.info(f"Jintd: {Jintd}")
 
         Jint = Jints + Jintd
 
@@ -517,7 +595,9 @@ def jintegral(step, l):
     for a in range(poscotip, poscotip+int(15./hLz)-1):
         Jval = _try(a)
         Jlist.append(Jval)
-        # break
+        break
+        
+        
     
     dirnametest = sim_params.DIR_NAME_TEST
     day = sim_params.DAY
