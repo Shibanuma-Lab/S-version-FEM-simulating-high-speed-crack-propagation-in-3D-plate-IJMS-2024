@@ -8,6 +8,7 @@ from const import simulation_params as sim_params
 from utils.step2str import step2str
 from utils.theta import theta
 from utils.logger import logger
+from mpmath import mp
 
 def q0(i: List[float]) -> float:
     """ input: i = [R, W]
@@ -261,7 +262,7 @@ def jintegral(step, l):
     dirnametest = sim_params.DIR_NAME_TEST
     day = sim_params.DAY
     if os.path.dirname(os.getcwd()) != "generation":
-        logger.info(os.path.dirname(os.getcwd()))
+        # logger.info(os.path.dirname(os.getcwd()))
         os.chdir(f"/home/lab/S-method-dynamic-crack-propgation-3D-plate/generation")
     path = f"Newton/{dirnametest}/{day}/step{str_step}"
 
@@ -363,12 +364,6 @@ def jintegral(step, l):
         else:
             angle = theta(posLzx0X[aL], posLzx0X[aL+1])[idx]
 
-        # logger.info(f"angle: {angle}")
-        # logger.info(f"dx: {dx}, dz: {dz}")
-        # logger.info(f"newposLX: {newposLX[:10]}")
-
-        # logger.info(np.cos(angle))
-
         xyz = [[
             np.cos(angle)*_[0] + np.sin(angle)*_[2] + np.cos(angle)*dx +  np.sin(angle)*dz,
             -np.sin(angle)*_[0] + np.cos(angle)*_[2] - np.sin(angle)*dx + np.cos(angle)*dz,
@@ -440,7 +435,8 @@ def jintegral(step, l):
                 j.append(np.dot(d, e))
             j = np.array(j, dtype=np.float64)
             J.append(j)
-            detJ.append(-np.linalg.det(j*10**3)*10**-9)
+            hoge = 10**3
+            detJ.append(-np.linalg.det(j*hoge)/hoge**3)
         # logger.info("detJ: {}".format(detJ)) 
 
         EE = jint.ee
@@ -461,6 +457,7 @@ def jintegral(step, l):
             _ = []
             for j2, dnn in zip(j1, Dnn):
                 j2 = np.array(j2, dtype=np.float64)
+                logger.info(f"j2: {np.dot(j2, np.linalg.pinv(j2))}")
                 _.append(np.dot(np.linalg.pinv(j2), dnn))
             bb.append(_)
         # logger.info("bb: {}".format(np.array(bb))) # ok
@@ -490,8 +487,8 @@ def jintegral(step, l):
                 idx = int(sum(ndoflistX[:elemq[i][j]-1])//3)
                 if ndoflistX[elemq[i][j]-1] == 3:
                     # logger.info(idx) ok
-                    logger.info(f"dispR: {dispR[idx]}")
-                    logger.info(f"acceR: {acceR[idx]}")
+                    # logger.info(f"dispR: {dispR[idx]}")
+                    # logger.info(f"acceR: {acceR[idx]}")
                     d.append(dispR[idx])
                     a.append(acceR[idx])
                     den.append([0., 0., 0.])
@@ -512,7 +509,7 @@ def jintegral(step, l):
         # logger.info("dispqe: {}".format(np.array(dispqe))) # NG
 
         accee = np.array([[np.dot(n, a) for a in acceqe] for n in nn]) + np.array([[np.dot(n, a) for a in accerich] for n in nn])
-        logger.info(f"accee: {accee}") # NG
+        # logger.info(f"accee: {accee}") # NG
 
         epsbf = np.array([calc_eps(b, d) for b, d in zip(bb, dispqe)])
         epsenrich = np.array([calc_eps(b, d) for b, d in zip(bb, dispqerich)])
@@ -538,7 +535,7 @@ def jintegral(step, l):
         # logger.info(f"deltabf: {deltabf[0]}")
         # logger.info(f"deltaenrich: {deltaenrich[0]}")
         # logger.info(f"delta: {delta[0]}")
-        logger.info(f"Dubf: {Dubf[0]}")
+        # logger.info(f"Dubf: {Dubf[0]}")
         # logger.info(f"Duenrich: {Duenrich[0]}")
         # logger.info(f"Du: {Du}")
 
@@ -564,28 +561,27 @@ def jintegral(step, l):
         Jints = sum(Jintsv)
         
         Jints /= meas
-        logger.info(f"Jints: {Jints}")
+        # logger.info(f"Jints: {Jints}")
 
         rho = jint.Rho
         def Jint0d(acce, Du, detJ):
             _ = []
             for a, du, dj, w in zip(acce, Du, detJ, weight):
+                # logger.info(f"a: {a}, du: {du}, dj: {dj}, w: {w}")
                 _.append(
                     (
                     (a[0]*du[0] + a[1]*du[1] + a[2]*du[2]) * rho * dj * w
                     )
                 )
+            # logger.info(f"_: {_}")
             return sum(_)
-        # logger.info()
+        # logger.info(weight)
         Jintdv = []
-        # logger.info(f"accee: {accee}")
-        # logger.info(f"Du: {Du}")
-        # logger.info(f"detJ: {detJ}")
         for a, du, dj in zip(accee, Du, detJ):
             Jintdv.append(Jint0d(a,du,dj))
         # logger.info(f"Jintdv: {Jintdv}")
         Jintd = sum(Jintdv)
-        logger.info(f"Jintd: {Jintd}")
+        # logger.info(f"Jintd: {Jintd}")
 
         Jint = Jints + Jintd
 
@@ -595,9 +591,6 @@ def jintegral(step, l):
     for a in range(poscotip, poscotip+int(15./hLz)-1):
         Jval = _try(a)
         Jlist.append(Jval)
-        break
-        
-        
     
     dirnametest = sim_params.DIR_NAME_TEST
     day = sim_params.DAY
