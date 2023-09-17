@@ -286,8 +286,7 @@ class LocalMesh:
         x_inp = posI[:, 0]
         y_inp = posI[:, 1]
         z_inp = [levelset(self.cotip, posI[i], self.tip_x) for i in range(len(posI))]
-        # logger.info(f"z_inp: {z_inp}")
-        
+
         self.disinf = interpolate.Rbf(x_inp, y_inp, z_inp, kind='cubic')
 
         z = 0.

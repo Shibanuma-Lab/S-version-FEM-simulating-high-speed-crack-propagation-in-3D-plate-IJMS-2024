@@ -89,7 +89,7 @@ def main():
 
     step_start = args.step_start
     step_last = args.step_end
-    INTERM = 0
+    INTERM = 79
     STEP_LAST = 300
     REstart = 0 if step_start == INTERM else 1  # 1:restart from dynamic analysis
     logger.info(f"REstart: {REstart}")

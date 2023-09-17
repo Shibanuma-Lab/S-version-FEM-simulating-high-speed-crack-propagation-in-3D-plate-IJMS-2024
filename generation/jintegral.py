@@ -355,11 +355,11 @@ def jintegral(step, l):
         idx = [_ for _ in range(len(numposLzx0X[aL])) if numposLzx0X[aL][_][0]==nL][0]
         
         if len(posLzx0X[aL+1]) < len(posLzx0X[aL]):
-            if idx-1>len(posLzx0[aL]):
-                logger.error("idx-1>len(posLzx0[aL])")
-                return
-            else:
-                angle = theta(posLzx0X[aL], posLzx0X[aL+1])[idx-1]
+            # if idx-1>len(posLzx0[aL]):
+            #     logger.error("idx-1>len(posLzx0[aL])")
+            #     return
+            # else:
+            angle = theta(posLzx0X[aL], posLzx0X[aL+1])[idx-1]
         else:
             angle = theta(posLzx0X[aL], posLzx0X[aL+1])[idx]
 
