@@ -103,29 +103,29 @@ class Boundary:
         yminfixL = list(range(sum(num_node_by_line[:nback]) + 1, num_node_zx + 1))
         ymaxfixL = list(range(num_node_zx * ndyL + 1, nnpL + 1))
         zminfixL = [i+1 for i, node in enumerate(posL) if math.isclose(node[2], 0.)]
-        TianyuxyzfixL = set()
+        OutxyzfixL = set()
         edgenode = self.g.edgenode
         for i in range(len(posL)):
             if judge(posL[i][0], posL[i][1], posL[i][2], edgenode):
-                TianyuxyzfixL.add(i+1)
+                OutxyzfixL.add(i+1)
 
         node_zx = l.node_zx
         node_by_line = l.node_by_line
 
-        Tianyufixinnerbf = set()
+        Outfixinnerbf = set()
         for i in range(len(node_by_line)):
             for j in range(len(node_by_line[i])):
                 if node_by_line[i][j][0] > 15.:
                     for k in range(len(node_zx)):
                         if np.linalg.norm(node_zx[k] - node_by_line[i][j]) < 10e-8:
-                            Tianyufixinnerbf.add(k+1)
+                            Outfixinnerbf.add(k+1)
                     break
-        Tianyufixinner = []
+        Outfixinner = []
         HL = const_local_mesh.HL
         for i in range(1, HL + 2):
-            Tianyufixinner += [x + (i-1)*num_node_zx for x in Tianyufixinnerbf]
+            Outfixinner += [x + (i-1)*num_node_zx for x in Outfixinnerbf]
 
-        diff = set(TianyuxyzfixL).difference(set(Tianyufixinner))
+        diff = set(OutxyzfixL).difference(set(Outfixinner))
         xfixL = set(xminfixL).union(set(xmaxfixL)).union(set(ymaxfixL))
         xfixL = xfixL.union(diff)
         nxfixL = len(xfixL)
