@@ -118,14 +118,14 @@ def solve_zi(a, p):
 
 def solve_zcf2(p, co, elesizeL, disinf):
     def f(z):
-        return disinf(z, p[1] + (p[0] - z)/(2*co[0]*p[0]))[0] - 2*elesizeL
+        return disinf(z, p[1] + (p[0] - z)/(2*co[0]*p[0]))[0] - elesizeL
     # logger.info(root(f, x0=p[0]).x)
     z = root(f, x0=p[0]).x[0]
     return z
 
 def solve_zcf22(pz, elesizeL, disinf, postip2x):
     def f(x):
-        return disinf([pz], x)[0] - 2*elesizeL
+        return disinf([pz], x)[0] - elesizeL
     x = root(f, x0=postip2x).x[0]
     return x
 
@@ -277,7 +277,7 @@ class LocalMesh:
         verin = const_local_mesh.verin
         horin = const_local_mesh.horin
         intin = const_local_mesh.intin
-        verinmin = self.tip_x - verin
+        verinmin = self.postip1x - verin
         horp = int(np.ceil(horin / intin)) + 1
         verp = int(np.ceil((2 * verin) / intin)) + 1
         NP = horp * verp
@@ -285,7 +285,7 @@ class LocalMesh:
         posI = np.array([[intin * i, verinmin + intin * j] for j in range(-verp, verp+1) for i in range(-horp, horp+1)])
         x_inp = posI[:, 0]
         y_inp = posI[:, 1]
-        z_inp = [levelset(self.cotip, posI[i], self.tip_x) for i in range(len(posI))]
+        z_inp = [levelset(self.cotip1, posI[i], self.postip1x) for i in range(len(posI))]
 
         self.disinf = interpolate.Rbf(x_inp, y_inp, z_inp, kind='cubic')
 
