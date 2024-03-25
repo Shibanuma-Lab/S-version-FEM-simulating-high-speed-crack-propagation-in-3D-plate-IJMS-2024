@@ -1,7 +1,7 @@
 import math
 from const import simulation_params as sim_params
 
-NOR_LIST = [0.8, 0.8, 1.0, 1.0, 1.2 * math.sqrt(0.99), 1.2 * math.sqrt(0.99)]
+NOR_LIST = [0.8, 0.8, 1.0, 1.0, 1.2 * math.sqrt(1.01), 1.2 * math.sqrt(1.01)]
 nor = NOR_LIST[sim_params.TEST_NUMBER-1]
 
 mag = 1         # magnification
