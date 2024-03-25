@@ -4,7 +4,7 @@ from const import const_global_mesh
 hGMin = const_global_mesh.hGMin
 
 # hL = math.floor(hGMin/6*100)*0.01       # loal mesh size in the x direction[mm]
-hL = 0.30
+hL = 0.3
 elesizeL = hL
 rxzL = 2      # ratio of x - z
 rxyL = 1        # ratio of x - y
